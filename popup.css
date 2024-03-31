@@ -1,0 +1,16 @@
+.container {
+  width: 250px;
+  padding: 10px;
+}
+
+input[type="text"] {
+  width: 150px;
+}
+
+button {
+  margin-left: 5px;
+}
+
+.hidden {
+  display: none;
+}
