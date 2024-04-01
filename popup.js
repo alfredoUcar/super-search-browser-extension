@@ -5,34 +5,49 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const searchButton = document.getElementById("searchButton");
   const results = document.getElementById("results");
-  const total = document.getElementById("total");
-  const current = document.getElementById("current");
+  const totalLabel = document.getElementById("total");
+  const currentLabel = document.getElementById("current");
   const prevButton = document.getElementById("prevButton");
   const nextButton = document.getElementById("nextButton");
 
-  searchButton.addEventListener("click", function () {
-    const searchText = searchInput.value;
+  const responseHandler = (response) => {
+    if (response.total > 0) {
+      results.classList.remove("hidden");
+      totalLabel.textContent = response.total;
+      currentLabel.textContent = response.current;
+      prevButton.disabled = false;
+      nextButton.disabled = false;
+    } else {
+      results.classList.add("hidden");
+      prevButton.disabled = true;
+      nextButton.disabled = true;
+    }
+  };
 
+  searchButton.addEventListener("click", function () {
     chrome.runtime.sendMessage(
-      { action: "search", searchText: searchText },
-      (response) => {
-        console.log({ response });
-        // results.classList.remove("hidden");
-        // total.textContent = response.total;
-        // current.textContent = response.current;
-      }
+      { action: "search", searchText: searchInput.value, index: 1 },
+      responseHandler
     );
   });
 
   prevButton.addEventListener("click", function () {
-    chrome.runtime.sendMessage({ action: "prev" }, (response) => {
-      console.log({ response });
-    });
+    const total = parseInt(totalLabel.textContent);
+    const current = parseInt(currentLabel.textContent);
+    const prev = current > 1 ? current - 1 : total;
+    chrome.runtime.sendMessage(
+      { action: "search", searchText: searchInput.value, index: prev },
+      responseHandler
+    );
   });
 
   nextButton.addEventListener("click", function () {
-    chrome.runtime.sendMessage({ action: "next" }, (response) => {
-      console.log({ response });
-    });
+    const total = parseInt(totalLabel.textContent);
+    const current = parseInt(currentLabel.textContent);
+    const next = current < total ? current + 1 : 1;
+    chrome.runtime.sendMessage(
+      { action: "search", searchText: searchInput.value, index: next },
+      responseHandler
+    );
   });
 });
