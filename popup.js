@@ -1,7 +1,21 @@
+const debounceTime = 500;
+
 document.addEventListener("DOMContentLoaded", function () {
   const searchInput = document.getElementById("searchInput");
 
   searchInput.focus();
+  let searchTimer;
+  searchInput.addEventListener("input", (event) => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      if (event.target.value) {
+        chrome.runtime.sendMessage(
+          { action: "search", searchText: event.target.value, index: 1 },
+          responseHandler
+        );
+      }
+    }, debounceTime);
+  });
 
   const searchButton = document.getElementById("searchButton");
   const results = document.getElementById("results");
