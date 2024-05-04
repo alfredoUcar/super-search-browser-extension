@@ -125,8 +125,9 @@ function searchContentScript(searchText, index) {
 
   // Helper function to highlight the N-th occurrence in nodes
   const highlightNthOccurrenceInNodes = (nodes, text, index, color) => {
-    document.querySelectorAll(".highlighted")[index - 1].style.backgroundColor =
-      color;
+    const node = document.querySelectorAll(".highlighted")[index - 1];
+    node.style.backgroundColor = color;
+    node.scrollIntoView();
   };
 
   const total = highlightOccurrence(searchText, index);
