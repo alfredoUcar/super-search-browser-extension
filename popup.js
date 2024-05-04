@@ -4,6 +4,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const searchInput = document.getElementById("searchInput");
 
   searchInput.focus();
+  searchInput.addEventListener("keyup", function (event) {
+    if (event.code === "Enter") {
+      if (event.shiftKey) {
+        prevButton.click();
+      } else {
+        nextButton.click();
+      }
+    }
+  });
+
   let searchTimer;
   searchInput.addEventListener("input", (event) => {
     clearTimeout(searchTimer);
