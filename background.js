@@ -41,7 +41,7 @@ function searchContentScript(searchText, index) {
 
     if (matches) {
       // Highlight all occurrences in yellow
-      highlightOccurrencesInNodes(visibleNodes, text, "yellow");
+      highlightOccurrencesInNodes(visibleNodes, text, index);
 
       // If 'n' parameter is specified, highlight the N-th occurrence in orange
       if (index) {
@@ -55,35 +55,69 @@ function searchContentScript(searchText, index) {
 
   // Helper function to get visible text nodes for the user
   const getVisibleTextNodes = (element) => {
-    const visibleNodes = [];
-    const children = element.childNodes;
-
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      if (child.nodeType === Node.TEXT_NODE) {
-        if (child.nodeValue.trim() !== "") {
-          visibleNodes.push(child);
-        }
-      } else if (
-        child.nodeType === Node.ELEMENT_NODE &&
-        child.style.display !== "none"
-      ) {
-        const subNodes = getVisibleTextNodes(child);
-        visibleNodes.push(...subNodes);
+    const targetNodes = [
+      "P",
+      "H1",
+      "H2",
+      "H3",
+      "H4",
+      "H5",
+      "H6",
+      "A",
+      "SPAN",
+      "STRONG",
+      "EM",
+      "BLOCKQUOTE",
+      "PRE",
+      "LI",
+      "DT",
+      "DD",
+      "LABEL",
+      "BUTTON",
+      "TEXTAREA",
+      "OPTION",
+      "LEGEND",
+    ];
+    const treeWalker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: function (node) {
+          if (
+            node.nodeValue.trim() !== "" &&
+            targetNodes.includes(node.parentNode.nodeName)
+          ) {
+            return NodeFilter.FILTER_ACCEPT;
+          } else {
+            return NodeFilter.FILTER_REJECT;
+          }
+        },
       }
+    );
+    const visibleNodes = [];
+
+    let currentNode;
+    while ((currentNode = treeWalker.nextNode())) {
+      visibleNodes.push(currentNode);
     }
 
     return visibleNodes;
   };
 
   // Helper function to highlight all occurrences in nodes
-  const highlightOccurrencesInNodes = (nodes, text, color) => {
+  const highlightOccurrencesInNodes = (nodes, text, index) => {
     const regex = new RegExp(text, "gi");
+    const mainColor = "yellow";
+    const selectedColor = "orange";
+    let current = 0;
+    let color;
     nodes.forEach((node) => {
       if (node.parentNode) {
+        current++;
+        color = index && index === current ? selectedColor : mainColor;
         node.parentNode.innerHTML = node.parentNode.innerHTML.replace(
           regex,
-          `<span class="highlighted" style="background-color: ${color};">$&</span>`
+          `<span class="highlighted" title="${current}" style="background-color: ${color};">$&</span>`
         );
       }
     });
@@ -91,31 +125,10 @@ function searchContentScript(searchText, index) {
 
   // Helper function to highlight the N-th occurrence in nodes
   const highlightNthOccurrenceInNodes = (nodes, text, index, color) => {
-    const regex = new RegExp(text, "gi");
-    let count = 0;
-    nodes.forEach((node) => {
-      if (node.parentNode) {
-        const matches = node.nodeValue.match(regex);
-        if (matches) {
-          for (const match of matches) {
-            count++;
-            if (count === index) {
-              const span = document.createElement("span");
-              span.innerHTML = match;
-              span.classList.add("highlighted");
-              span.style.backgroundColor = color;
-              const parentNode = node.parentNode;
-              parentNode.replaceChild(span, node);
-              span.scrollIntoView({ behavior: "smooth", block: "center" });
-              return;
-            }
-          }
-        }
-      }
-    });
+    document.querySelectorAll(".highlighted")[index - 1].style.backgroundColor =
+      color;
   };
 
   const total = highlightOccurrence(searchText, index);
-  console.log({ searchText, index });
   return { total, current: index };
 }
