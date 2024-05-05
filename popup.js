@@ -25,7 +25,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }, debounceTime);
   });
 
-  const searchButton = document.getElementById("searchButton");
   const results = document.getElementById("results");
   const totalLabel = document.getElementById("total");
   const currentLabel = document.getElementById("current");
@@ -45,13 +44,6 @@ document.addEventListener("DOMContentLoaded", function () {
       nextButton.disabled = true;
     }
   };
-
-  searchButton.addEventListener("click", function () {
-    chrome.runtime.sendMessage(
-      { action: "search", searchText: searchInput.value, index: 1 },
-      responseHandler
-    );
-  });
 
   prevButton.addEventListener("click", function () {
     const total = parseInt(totalLabel.textContent);
