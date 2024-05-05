@@ -18,12 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
   searchInput.addEventListener("input", (event) => {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
-      if (event.target.value) {
-        chrome.runtime.sendMessage(
-          { action: "search", searchText: event.target.value, index: 1 },
-          responseHandler
-        );
-      }
+      chrome.runtime.sendMessage(
+        { action: "search", searchText: event.target.value, index: 1 },
+        responseHandler
+      );
     }, debounceTime);
   });
 

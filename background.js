@@ -30,6 +30,10 @@ function searchContentScript(searchText, index) {
       element.outerHTML = element.innerHTML;
     });
 
+    if (text.trim() === "") {
+      return 0;
+    }
+
     // Get all visible text nodes for the user
     const visibleNodes = getVisibleTextNodes(document.body);
 
