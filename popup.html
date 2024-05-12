@@ -9,18 +9,33 @@
 </head>
 <body>
   <div class="container">
-    <input type="text" id="searchInput" placeholder="Search...">
+    <div>
+      <input type="text" id="searchInput" placeholder="Search...">
+      <button id="prevButton" title="Previous (Shift + Énter)" disabled>
+        <span class="material-symbols-outlined">
+          expand_less
+        </span>
+      </button>
+      <button id="nextButton" title="Next (Enter)" disabled>
+        <span class="material-symbols-outlined">
+          expand_more
+        </span>
+      </button>
+    </div>
+    <div>
+      <button id="caseSensitiveButton" title="Case sensitive" class="toggle">
+        <span class="material-symbols-outlined">
+          format_size
+        </span>
+      </button>
+      <button id="regexButton" title="Regular expression" class="toggle">
+        <svg xmlns="http://www.w3.org/2000/svg" height="14px" viewBox="0 -960 960 960" width="14px" fill="currentColor"><path d="M480.2-240Q380-240 310-309.8q-70-69.8-70-170T309.8-650q69.8-70 170-70T650-650.2q70 69.8 70 170T650.2-310q-69.8 70-170 70Z"/></svg>
+        <span class="material-symbols-outlined">
+          asterisk
+        </span>
+      </button>
+    </div>
     <span id="matchCount"></span>
-    <button id="prevButton" disabled>
-      <span class="material-symbols-outlined">
-        expand_less
-      </span>
-    </button>
-    <button id="nextButton" disabled>
-      <span class="material-symbols-outlined">
-        expand_more
-      </span>
-    </button>
   </div>
   <div id="results" class="hidden">
     <span id="current"></span>/

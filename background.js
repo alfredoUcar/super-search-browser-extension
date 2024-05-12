@@ -10,7 +10,12 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         {
           target: { tabId },
           func: searchContentScript,
-          args: [message.searchText, message.index],
+          args: [
+            message.searchText,
+            message.index,
+            message.useRegex,
+            message.caseSensitive,
+          ],
         },
         responseHandler
       );
@@ -20,7 +25,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   return true; // response will be asynchronous
 });
 
-function searchContentScript(searchText, index) {
+function searchContentScript(searchText, index, useRegex, caseSensitive) {
   // Helper functions ////////////////////
 
   const highlightOccurrence = (text, index) => {
@@ -41,11 +46,17 @@ function searchContentScript(searchText, index) {
     const fullText = visibleNodes.map((node) => node.textContent).join(" ");
 
     // Search for all occurrences of the text in visible content
-    const matches = fullText.match(new RegExp(text, "gi"));
+    const flags = caseSensitive ? "g" : "gi";
+    const escapedText = useRegex
+      ? text
+      : text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    console.log({ escapedText, flags });
+    const matches = fullText.match(new RegExp(escapedText, flags));
 
     if (matches) {
       // Highlight all occurrences in yellow
-      highlightOccurrencesInNodes(visibleNodes, text, index);
+      highlightOccurrencesInNodes(visibleNodes, text, index, flags);
 
       // If 'n' parameter is specified, highlight the N-th occurrence in orange
       if (index) {
@@ -109,8 +120,8 @@ function searchContentScript(searchText, index) {
   };
 
   // Helper function to highlight all occurrences in nodes
-  const highlightOccurrencesInNodes = (nodes, text, index) => {
-    const regex = new RegExp(text, "gi");
+  const highlightOccurrencesInNodes = (nodes, text, index, flags) => {
+    const regex = new RegExp(text, flags);
     const mainColor = "yellow";
     const selectedColor = "orange";
     let current = 0;
@@ -121,7 +132,7 @@ function searchContentScript(searchText, index) {
         color = index && index === current ? selectedColor : mainColor;
         node.parentNode.innerHTML = node.parentNode.innerHTML.replace(
           regex,
-          `<span class="highlighted" title="${current}" style="background-color: ${color};">$&</span>`
+          `<span class="highlighted" title="${current}" style="background-color: ${color}; color: black">$&</span>`
         );
       }
     });

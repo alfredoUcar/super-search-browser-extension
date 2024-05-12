@@ -18,10 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   searchInput.addEventListener("input", (event) => {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
-      chrome.runtime.sendMessage(
-        { action: "search", searchText: event.target.value, index: 1 },
-        responseHandler
-      );
+      searchText(1);
     }, debounceTime);
   });
 
@@ -30,6 +27,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const currentLabel = document.getElementById("current");
   const prevButton = document.getElementById("prevButton");
   const nextButton = document.getElementById("nextButton");
+  const regexButton = document.getElementById("regexButton");
+  const caseSensitiveButton = document.getElementById("caseSensitiveButton");
+
+  const searchText = (index) => {
+    chrome.runtime.sendMessage(
+      {
+        action: "search",
+        searchText: searchInput.value,
+        index: index,
+        useRegex: regexButton.classList.contains("enabled"),
+        caseSensitive: caseSensitiveButton.classList.contains("enabled"),
+      },
+      responseHandler
+    );
+  };
 
   const responseHandler = (response) => {
     if (response.total > 0) {
@@ -49,19 +61,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const total = parseInt(totalLabel.textContent);
     const current = parseInt(currentLabel.textContent);
     const prev = current > 1 ? current - 1 : total;
-    chrome.runtime.sendMessage(
-      { action: "search", searchText: searchInput.value, index: prev },
-      responseHandler
-    );
+    searchText(prev);
   });
 
   nextButton.addEventListener("click", function () {
     const total = parseInt(totalLabel.textContent);
     const current = parseInt(currentLabel.textContent);
     const next = current < total ? current + 1 : 1;
-    chrome.runtime.sendMessage(
-      { action: "search", searchText: searchInput.value, index: next },
-      responseHandler
-    );
+    searchText(next);
   });
+
+  function toggle() {
+    console.log("toggle");
+    this.classList.toggle("enabled");
+    searchText(1);
+  }
+
+  regexButton.addEventListener("click", toggle);
+  caseSensitiveButton.addEventListener("click", toggle);
 });

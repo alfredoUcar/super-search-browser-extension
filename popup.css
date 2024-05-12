@@ -1,10 +1,17 @@
 .container {
+  display: flex;
+  flex-direction: column;
   width: 250px;
   padding: 10px;
 }
 
 input[type="text"] {
-  width: 150px;
+  width: 250px;
+  height: 25px;
+  border: 1px solid grey;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 3px 7px;
 }
 
 button {
@@ -13,4 +20,14 @@ button {
 
 .hidden {
   display: none;
+}
+
+.toggle {
+  cursor: pointer;
+  border: none;
+  color: grey;
+}
+
+.toggle.enabled {
+  color: black;
 }
