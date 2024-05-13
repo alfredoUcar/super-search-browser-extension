@@ -51,7 +51,6 @@ function searchContentScript(searchText, index, useRegex, caseSensitive) {
       ? text
       : text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-    console.log({ escapedText, flags });
     const matches = fullText.match(new RegExp(escapedText, flags));
 
     if (matches) {
